@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexLink — Connect Beyond Limits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #070810;
+      --bg2: #0D0F1E;
+      --bg3: #131629;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --border-glow: rgba(99,120,255,0.3);
+      --cyan: #4DFFD2;
+      --blue: #6378FF;
+      --violet: #A855F7;
+      --pink: #F471B5;
+      --text: #F0F2FF;
+      --text2: #8892B0;
+      --text3: #4A5568;
+      --danger: #FF5757;
+      --success: #4DFFD2;
+      --warning: #FFB347;
+      --card-radius: 20px;
+      --input-radius: 14px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== BACKGROUND EFFECTS ===== */
+    .bg-orbs {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .bg-orbs::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,120,255,0.12) 0%, transparent 70%);
+      top: -200px; left: -100px;
+      animation: orbFloat 12s ease-in-out infinite;
+    }
+    .bg-orbs::after {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(168,85,247,0.10) 0%, transparent 70%);
+      bottom: -100px; right: -100px;
+      animation: orbFloat 15s ease-in-out infinite reverse;
+    }
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(30px,-20px) scale(1.05); }
+      66% { transform: translate(-20px,30px) scale(0.95); }
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 2px; }
+
+    /* ===== PAGE SYSTEM ===== */
+    .page { display: none; position: relative; z-index: 1; }
+    .page.active { display: flex; }
+
+    /* ===== AUTH PAGES ===== */
+    #auth-page {
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .auth-logo .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 30px rgba(99,120,255,0.4);
+    }
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px; font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--blue), var(--violet));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .auth-tagline {
+      color: var(--text2);
+      font-size: 14px;
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .auth-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg3);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: none;
+      color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      color: white;
+      box-shadow: 0 4px 20px rgba(99,120,255,0.3);
+    }
+
+    .form-row { display: flex; gap: 16px; }
+    .form-row .form-group { flex: 1; }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap .icon {
+      position: absolute;
+      left: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 14px;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+    .input-wrap input:focus ~ .icon,
+    .input-wrap input:focus + * .icon { color: var(--cyan); }
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 16px 13px 44px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--input-radius);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .input-wrap input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(99,120,255,0.15);
+    }
+    .input-wrap input::placeholder { color: var(--text3); }
+    .eye-btn {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--text3); cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .eye-btn:hover { color: var(--text2); }
+
+    .pin-hint {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--violet) 100%);
+      border: none;
+      border-radius: var(--input-radius);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(99,120,255,0.4); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-primary .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .form-error {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    .form-success {
+      color: var(--success);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    /* ===== PERMISSIONS POPUP ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .permissions-modal {
+      background: var(--bg2);
+      border: 1px solid var(--border-glow);
+      border-radius: 28px;
+      padding: 40px;
+      max-width: 440px; width: 100%;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 60px rgba(99,120,255,0.15);
+      animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.85) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .perm-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .perm-icon-ring {
+      width: 72px; height: 72px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 0 40px rgba(77,255,210,0.3);
+    }
+    .perm-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .perm-header p {
+      color: var(--text2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .perm-list { margin-bottom: 32px; }
+    .perm-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg3);
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+    .perm-item-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .perm-item-icon.cam { background: rgba(99,120,255,0.15); color: var(--blue); }
+    .perm-item-icon.loc { background: rgba(77,255,210,0.12); color: var(--cyan); }
+    .perm-item-icon.call { background: rgba(168,85,247,0.12); color: var(--violet); }
+    .perm-item-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .perm-item-info p { font-size: 12px; color: var(--text2); }
+    .perm-actions { display: flex; gap: 12px; }
+    .btn-decline {
+      flex: 1; padding: 13px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-decline:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-allow {
+      flex: 2; padding: 13px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      border: none;
+      border-radius: 12px;
+      color: #070810;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-allow:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(77,255,210,0.3); }
+
+    /* ===== MAIN APP ===== */
+    #app-page {
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .app-header {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 70px;
+      background: rgba(7,8,16,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 24px;
+      gap: 20px;
+      z-index: 100;
+    }
+    .header-logo {
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .header-logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .header-logo-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px; font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .header-search {
+      flex: 1;
+      max-width: 340px;
+      position: relative;
+    }
+    .header-search input {
+      width: 100%;
+      padding: 9px 16px 9px 40px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .header-search input:focus { border-color: var(--blue); }
+    .header-search .search-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .header-nav {
+      display: flex; align-items: center; gap: 4px;
+      margin-left: auto;
+    }
+    .nav-btn {
+      width: 44px; height: 44px;
+      border: none;
+      background: none;
+      color: var(--text2);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .nav-btn:hover { background: var(--surface); color: var(--text); }
+    .nav-btn.active { background: rgba(99,120,255,0.15); color: var(--blue); }
+    .nav-btn .badge {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 8px; height: 8px;
+      background: var(--pink);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
+
+    .user-avatar-btn {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--blue);
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: white;
+      margin-left: 4px;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .user-avatar-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(99,120,255,0.4); }
+    .online-dot {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 10px; height: 10px;
+      background: var(--cyan);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
+
+    /* MAIN CONTENT */
+    .app-main {
+      margin-top: 70px;
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 70px);
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 72px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .sidebar-btn {
+      width: 48px; height: 48px;
+      border: none;
+      background: none;
+      color: var(--text3);
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .sidebar-btn:hover { background: var(--surface); color: var(--text2); }
+    .sidebar-btn.active {
+      background: rgba(99,120,255,0.15);
+      color: var(--blue);
+      box-shadow: 0 0 20px rgba(99,120,255,0.2);
+    }
+    .sidebar-btn.active::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      width: 3px; height: 28px;
+      background: var(--blue);
+      border-radius: 0 3px 3px 0;
+    }
+    .sidebar-divider {
+      width: 32px;
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+    .sidebar-tooltip {
+      position: absolute;
+      left: 100%;
+      background: var(--bg3);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(8px);
+      transition: all 0.15s;
+      border: 1px solid var(--border);
+    }
+    .sidebar-btn:hover .sidebar-tooltip { opacity: 1; transform: translateX(12px); }
+
+    /* CONTENT PANELS */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+    }
+    .panel {
+      display: none;
+      flex: 1;
+    }
+    .panel.active { display: flex; flex-direction: column; }
+
+    /* ===== DASHBOARD PANEL ===== */
+    .dashboard {
+      padding: 32px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(99,120,255,0.15) 0%, rgba(168,85,247,0.1) 100%);
+      border: 1px solid rgba(99,120,255,0.2);
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -10%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(77,255,210,0.08) 0%, transparent 70%);
+    }
+    .welcome-banner h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .welcome-banner p { color: var(--text2); font-size: 15px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      transition: all 0.3s;
+    }
+    .stat-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99,120,255,0.1);
+    }
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+    .stat-icon.blue { background: rgba(99,120,255,0.15); color: var(--blue); }
+    .stat-icon.cyan { background: rgba(77,255,210,0.12); color: var(--cyan); }
+    .stat-icon.violet { background: rgba(168,85,247,0.12); color: var(--violet); }
+    .stat-icon.pink { background: rgba(244,113,181,0.12); color: var(--pink); }
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px; font-weight: 700;
+      color: var(--text);
+    }
+    .stat-label { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+    /* Quick Access Cards */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .quick-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .quick-card:hover {
+      border-color: var(--blue);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(99,120,255,0.15);
+    }
+    .quick-card-icon {
+      width: 56px; height: 56px;
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      margin: 0 auto 16px;
+    }
+    .quick-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .quick-card p { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+    /* ===== CHAT PANEL ===== */
+    .chat-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .contacts-list {
+      width: 300px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .contacts-header {
+      padding: 20px 16px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .contacts-header h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px; font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .contacts-search {
+      position: relative;
+    }
+    .contacts-search input {
+      width: 100%;
+      padding: 9px 14px 9px 36px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+    .contacts-search i {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 12px;
+    }
+    .contacts-scroll { flex: 1; overflow-y: auto; }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .contact-item:hover { background: var(--surface); }
+    .contact-item.active { background: rgba(99,120,255,0.1); }
+    .contact-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .contact-avatar .online-dot { width: 10px; height: 10px; }
+    .contact-info { flex: 1; min-width: 0; }
+    .contact-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .contact-last { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .contact-time { font-size: 11px; color: var(--text3); flex-shrink: 0; }
+
+    /* Chat window */
+    .chat-window {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chat-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chat-header-info { flex: 1; }
+    .chat-header-name { font-size: 15px; font-weight: 600; }
+    .chat-header-status { font-size: 12px; color: var(--cyan); }
+    .chat-actions { display: flex; gap: 8px; }
+    .chat-action-btn {
+      width: 38px; height: 38px;
+      border: 1px solid var(--border);
+      background: none;
+      border-radius: 10px;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .chat-action-btn:hover { background: var(--surface); color: var(--blue); border-color: var(--blue); }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .msg-wrap { display: flex; gap: 10px; max-width: 70%; }
+    .msg-wrap.me { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 100%;
+      word-break: break-word;
+    }
+    .msg-wrap:not(.me) .msg-bubble {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .msg-wrap.me .msg-bubble {
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .msg-time { font-size: 10px; color: var(--text3); margin-top: 4px; text-align: right; }
+
+    .chat-input-area {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 12px 18px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--blue); }
+    .send-btn {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(99,120,255,0.4); }
+
+    .chat-empty {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px; color: var(--text3);
+    }
+    .chat-empty i { font-size: 48px; opacity: 0.3; }
+    .chat-empty p { font-size: 14px; }
+
+    /* ===== CALLS PANEL ===== */
+    .calls-panel {
+      padding: 32px;
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .panel-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px; font-weight: 700;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .call-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .call-item:hover { border-color: var(--border-glow); }
+    .call-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .call-icon.incoming { background: rgba(77,255,210,0.12); color: var(--cyan); }
+    .call-icon.outgoing { background: rgba(99,120,255,0.15); color: var(--blue); }
+    .call-icon.missed { background: rgba(255,87,87,0.12); color: var(--danger); }
+    .call-info { flex: 1; }
+    .call-name { font-size: 14px; font-weight: 600; }
+    .call-detail { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .call-time { font-size: 12px; color: var(--text3); }
+    .call-action-btns { display: flex; gap: 8px; }
+    .call-btn {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .call-btn.video { background: rgba(77,255,210,0.15); color: var(--cyan); }
+    .call-btn.voice { background: rgba(99,120,255,0.15); color: var(--blue); }
+    .call-btn:hover { transform: scale(1.1); }
+
+    /* Active Call Modal */
+    .call-modal {
+      background: var(--bg2);
+      border: 1px solid var(--border-glow);
+      border-radius: 28px;
+      padding: 48px 40px;
+      max-width: 360px; width: 100%;
+      text-align: center;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .call-avatar-ring {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 700;
+      position: relative;
+    }
+    .call-avatar-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(var(--cyan), var(--blue), var(--violet), var(--cyan));
+      animation: spin 2s linear infinite;
+      z-index: -1;
+    }
+    .call-modal h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .call-modal .call-status { color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+    .call-timer { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; color: var(--cyan); margin-bottom: 36px; }
+    .call-controls { display: flex; justify-content: center; gap: 20px; }
+    .ctrl-btn {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .ctrl-btn.mute { background: var(--bg3); color: var(--text2); }
+    .ctrl-btn.video-ctrl { background: var(--bg3); color: var(--text2); }
+    .ctrl-btn.end { background: var(--danger); color: white; }
+    .ctrl-btn:hover { transform: scale(1.1); }
+
+    /* ===== LOCATION PANEL ===== */
+    .location-panel {
+      padding: 32px;
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .map-container {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .map-placeholder {
+      text-align: center;
+      color: var(--text2);
+    }
+    .map-placeholder i { font-size: 48px; margin-bottom: 12px; color: var(--cyan); opacity: 0.6; }
+    .map-placeholder p { font-size: 14px; }
+    .map-dot {
+      position: absolute;
+      width: 20px; height: 20px;
+      background: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(77,255,210,0.6);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(77,255,210,0.6), 0 0 0 0 rgba(77,255,210,0.3); }
+      50% { box-shadow: 0 0 20px rgba(77,255,210,0.8), 0 0 0 15px rgba(77,255,210,0); }
+    }
+    .location-form {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+    }
+    .location-form h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px; font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .share-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .share-input:focus { border-color: var(--blue); }
+    .share-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      border: none;
+      border-radius: 12px;
+      color: #070810;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+    .share-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 25px rgba(77,255,210,0.3); }
+
+    /* ===== SEARCH PANEL ===== */
+    .search-panel {
+      padding: 32px;
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .search-header { margin-bottom: 28px; }
+    .big-search-wrap {
+      display: flex;
+      gap: 10px;
+    }
+    .big-search {
+      flex: 1;
+      padding: 14px 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .big-search:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(99,120,255,0.1); }
+    .search-engine-btns { display: flex; gap: 10px; margin-top: 12px; }
+    .engine-btn {
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .engine-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(99,120,255,0.08); }
+    .engine-btn.google:hover { border-color: #4285F4; color: #4285F4; }
+    .engine-btn.youtube:hover { border-color: #FF0000; color: #FF0000; }
+    .yt-embed-area {
+      margin-top: 24px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .yt-embed-area iframe { width: 100%; height: 400px; border: none; display: block; }
+
+    /* ===== PROFILE DROPDOWN ===== */
+    .profile-dropdown {
+      position: absolute;
+      top: 76px; right: 24px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 8px;
+      min-width: 220px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      z-index: 200;
+      display: none;
+      animation: dropIn 0.2s ease;
+    }
+    .profile-dropdown.show { display: block; }
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .dropdown-user {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+    .dropdown-user-name { font-size: 14px; font-weight: 600; }
+    .dropdown-user-email { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text2);
+      transition: all 0.15s;
+    }
+    .dropdown-item:hover { background: var(--surface); color: var(--text); }
+    .dropdown-item.danger:hover { color: var(--danger); }
+    .dropdown-item i { width: 18px; text-align: center; }
+
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      display: flex; flex-direction: column; gap: 10px;
+      z-index: 9999;
+    }
+    .toast {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      min-width: 260px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      font-size: 14px;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(20px) scale(0.9); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error { border-left: 3px solid var(--danger); }
+    .toast.info { border-left: 3px solid var(--blue); }
+    .toast-icon { font-size: 18px; }
+    .toast.success .toast-icon { color: var(--success); }
+    .toast.error .toast-icon { color: var(--danger); }
+    .toast.info .toast-icon { color: var(--blue); }
+
+    /* ===== UTILITIES ===== */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .hidden { display: none !important; }
+    .loading { opacity: 0.6; pointer-events: none; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .contacts-list { width: 100%; }
+      .chat-window { display: none; }
+      .chat-layout.chat-open .contacts-list { display: none; }
+      .chat-layout.chat-open .chat-window { display: flex; }
+      .form-row { flex-direction: column; gap: 0; }
+      .dashboard, .calls-panel, .location-panel, .search-panel { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-orbs"></div>
+
+<!-- AUTH PAGE -->
+<div id="auth-page" class="page active">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">🌐</div>
+        <span class="logo-text">NexLink</span>
+      </div>
+      <p class="auth-tagline">Connect · Communicate · Collaborate</p>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showAuthTab('login')">Sign In</button>
+        <button class="auth-tab" onclick="showAuthTab('signup')">Create Account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-envelope icon"></i>
+            <input type="email" id="login-email" placeholder="you@example.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock icon"></i>
+            <input type="password" id="login-password" placeholder="Enter your password" required />
+            <button type="button" class="eye-btn" onclick="togglePassword('login-password', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group" id="login-pin-group" style="display:none;">
+          <label>4-Digit PIN</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-key icon"></i>
+            <input type="password" id="login-pin" placeholder="Enter your PIN" maxlength="4" inputmode="numeric" />
+          </div>
+        </div>
+        <div id="login-error" class="form-error" style="display:none;margin-bottom:12px;"></div>
+        <button type="submit" class="btn-primary" id="login-btn">
+          Sign In to NexLink
+        </button>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="signup-form" style="display:none;" onsubmit="handleSignup(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-user icon"></i>
+              <input type="text" id="signup-first" placeholder="John" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <div class="input-wrap">
+              <i class="fa-regular fa-user icon"></i>
+              <input type="text" id="signup-last" placeholder="Doe" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-envelope icon"></i>
+            <input type="email" id="signup-email" placeholder="you@example.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock icon"></i>
+            <input type="password" id="signup-password" placeholder="Min. 8 chars, uppercase + number" required />
+            <button type="button" class="eye-btn" onclick="togglePassword('signup-password', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-shield-halved icon"></i>
+            <input type="password" id="signup-confirm" placeholder="Repeat your password" required />
+            <button type="button" class="eye-btn" onclick="togglePassword('signup-confirm', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>4-Digit PIN <span style="color:var(--text3);font-style:italic;">(Optional)</span></label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-hashtag icon"></i>
+            <input type="password" id="signup-pin" placeholder="Optional security PIN" maxlength="4" inputmode="numeric" />
+          </div>
+          <div class="pin-hint">💡 A PIN adds extra security when logging in from a new device.</div>
+        </div>
+        <div id="signup-error" class="form-error" style="display:none;margin-bottom:12px;"></div>
+        <button type="submit" class="btn-primary" id="signup-btn">
+          Create My Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- PERMISSIONS MODAL -->
+<div class="modal-overlay" id="permissions-modal">
+  <div class="permissions-modal">
+    <div class="perm-header">
+      <div class="perm-icon-ring">🔐</div>
+      <h2>Allow NexLink Access</h2>
+      <p>To make calls, share location, and connect with friends, NexLink needs permission to access your device.</p>
+    </div>
+    <div class="perm-list">
+      <div class="perm-item">
+        <div class="perm-item-icon cam"><i class="fa-solid fa-camera"></i></div>
+        <div class="perm-item-info">
+          <h4>Camera & Microphone</h4>
+          <p>For video and voice calls with your contacts</p>
+        </div>
+      </div>
+      <div class="perm-item">
+        <div class="perm-item-icon loc"><i class="fa-solid fa-location-dot"></i></div>
+        <div class="perm-item-info">
+          <h4>Location</h4>
+          <p>Share your location to set up meetings</p>
+        </div>
+      </div>
+      <div class="perm-item">
+        <div class="perm-item-icon call"><i class="fa-solid fa-phone"></i></div>
+        <div class="perm-item-info">
+          <h4>Call Notifications</h4>
+          <p>Get notified of incoming calls even when away</p>
+        </div>
+      </div>
+    </div>
+    <div class="perm-actions">
+      <button class="btn-decline" onclick="handlePermissions(false)">Decline</button>
+      <button class="btn-allow" onclick="handlePermissions(true)">✓ Allow Access</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVE CALL MODAL -->
+<div class="modal-overlay" id="call-modal">
+  <div class="call-modal">
+    <div class="call-avatar-ring" id="call-avatar-text">JD</div>
+    <h2 id="call-contact-name">John Doe</h2>
+    <p class="call-status" id="call-status-text">Calling...</p>
+    <div class="call-timer hidden" id="call-timer">0:00</div>
+    <div class="call-controls">
+      <button class="ctrl-btn mute" id="mute-btn" onclick="toggleMute()" title="Mute">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      <button class="ctrl-btn end" onclick="endCall()" title="End Call">
+        <i class="fa-solid fa-phone-slash"></i>
+      </button>
+      <button class="ctrl-btn video-ctrl" id="vid-btn" onclick="toggleVideo()" title="Video">
+        <i class="fa-solid fa-video"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE DROPDOWN -->
+<div class="profile-dropdown" id="profile-dropdown">
+  <div class="dropdown-user">
+    <div class="dropdown-user-name" id="dd-name">John Doe</div>
+    <div class="dropdown-user-email" id="dd-email">john@example.com</div>
+  </div>
+  <div class="dropdown-item" onclick="openPanel('dashboard')"><i class="fa-solid fa-house"></i> Dashboard</div>
+  <div class="dropdown-item" onclick="openPanel('chat')"><i class="fa-solid fa-comment"></i> Messages</div>
+  <div class="dropdown-item" onclick="openPanel('location')"><i class="fa-solid fa-location-dot"></i> Share Location</div>
+  <div class="dropdown-item danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- MAIN APP PAGE -->
+<div id="app-page" class="page">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-logo">
+      <div class="header-logo-icon">🌐</div>
+      <span class="header-logo-name">NexLink</span>
+    </div>
+
+    <div class="header-search">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" id="header-search-input" placeholder="Search people, messages..." />
+    </div>
+
+    <nav class="header-nav">
+      <button class="nav-btn" onclick="openPanel('calls')" title="Calls">
+        <i class="fa-solid fa-phone"></i>
+      </button>
+      <button class="nav-btn" onclick="openPanel('chat')" title="Messages">
+        <i class="fa-solid fa-message"></i>
+        <span class="badge"></span>
+      </button>
+      <button class="nav-btn" onclick="openPanel('location')" title="Share Location">
+        <i class="fa-solid fa-location-dot"></i>
+      </button>
+      <button class="nav-btn" onclick="openPanel('search')" title="Search Web">
+        <i class="fa-brands fa-google"></i>
+      </button>
+      <div class="user-avatar-btn" id="user-avatar-btn" onclick="toggleDropdown()">
+        <span id="header-avatar-initials">?</span>
+        <span class="online-dot"></span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN AREA -->
+  <div class="app-main">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <button class="sidebar-btn active" onclick="openPanel('dashboard')" id="sb-dashboard">
+        <i class="fa-solid fa-house"></i>
+        <span class="sidebar-tooltip">Home</span>
+      </button>
+      <button class="sidebar-btn" onclick="openPanel('chat')" id="sb-chat">
+        <i class="fa-solid fa-message"></i>
+        <span class="sidebar-tooltip">Messages</span>
+      </button>
+      <button class="sidebar-btn" onclick="openPanel('calls')" id="sb-calls">
+        <i class="fa-solid fa-phone"></i>
+        <span class="sidebar-tooltip">Calls</span>
+      </button>
+      <button class="sidebar-btn" onclick="openPanel('location')" id="sb-location">
+        <i class="fa-solid fa-location-dot"></i>
+        <span class="sidebar-tooltip">Location</span>
+      </button>
+      <div class="sidebar-divider"></div>
+      <button class="sidebar-btn" onclick="openPanel('search')" id="sb-search">
+        <i class="fa-brands fa-google"></i>
+        <span class="sidebar-tooltip">Search Web</span>
+      </button>
+      <button class="sidebar-btn" onclick="openPanel('people')" id="sb-people">
+        <i class="fa-solid fa-user-group"></i>
+        <span class="sidebar-tooltip">People</span>
+      </button>
+    </aside>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+
+      <!-- DASHBOARD PANEL -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="dashboard">
+          <div class="welcome-banner">
+            <h1 id="welcome-text">Welcome back! 👋</h1>
+            <p>Stay connected with your friends, make calls, and share your world.</p>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue"><i class="fa-solid fa-user-group"></i></div>
+              <div class="stat-value" id="stat-contacts">0</div>
+              <div class="stat-label">Connections</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon cyan"><i class="fa-solid fa-message"></i></div>
+              <div class="stat-value" id="stat-messages">0</div>
+              <div class="stat-label">Messages</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon violet"><i class="fa-solid fa-phone"></i></div>
+              <div class="stat-value" id="stat-calls">0</div>
+              <div class="stat-label">Total Calls</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon pink"><i class="fa-solid fa-location-dot"></i></div>
+              <div class="stat-value" id="stat-locations">0</div>
+              <div class="stat-label">Locations Shared</div>
+            </div>
+          </div>
+          <div class="quick-grid">
+            <div class="quick-card" onclick="startNewCall()">
+              <div class="quick-card-icon" style="background:rgba(77,255,210,0.12);color:var(--cyan);">
+                <i class="fa-solid fa-phone-volume"></i>
+              </div>
+              <h3>Start a Call</h3>
+              <p>Voice or video call with any of your contacts</p>
+            </div>
+            <div class="quick-card" onclick="openPanel('chat')">
+              <div class="quick-card-icon" style="background:rgba(99,120,255,0.15);color:var(--blue);">
+                <i class="fa-solid fa-comments"></i>
+              </div>
+              <h3>Send Message</h3>
+              <p>Chat with friends in real time</p>
+            </div>
+            <div class="quick-card" onclick="openPanel('location')">
+              <div class="quick-card-icon" style="background:rgba(168,85,247,0.12);color:var(--violet);">
+                <i class="fa-solid fa-map-location-dot"></i>
+              </div>
+              <h3>Share Location</h3>
+              <p>Set up a meeting point with your team</p>
+            </div>
+            <div class="quick-card" onclick="openPanel('search')">
+              <div class="quick-card-icon" style="background:rgba(244,113,181,0.12);color:var(--pink);">
+                <i class="fa-brands fa-youtube"></i>
+              </div>
+              <h3>Browse & Search</h3>
+              <p>Google search and YouTube inside NexLink</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT PANEL -->
+      <div class="panel" id="panel-chat">
+        <div class="chat-layout" id="chat-layout">
+          <div class="contacts-list">
+            <div class="contacts-header">
+              <h3>Messages</h3>
+              <div class="contacts-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search contacts..." id="contact-search-input" oninput="filterContacts(this.value)" />
+              </div>
+            </div>
+            <div class="contacts-scroll" id="contacts-scroll">
+              <!-- populated by JS -->
+              <div style="padding:20px;text-align:center;color:var(--text3);">
+                <i class="fa-solid fa-user-plus" style="font-size:32px;margin-bottom:10px;display:block;opacity:0.3;"></i>
+                <p style="font-size:13px;">Find and add people via the People panel to start chatting.</p>
+              </div>
+            </div>
+          </div>
+          <div class="chat-window" id="chat-window">
+            <div class="chat-empty" id="chat-empty">
+              <i class="fa-regular fa-comment-dots"></i>
+              <p>Select a contact to start chatting</p>
+            </div>
+            <div id="chat-active" style="display:none;flex:1;flex-direction:column;display:none;">
+              <div class="chat-header">
+                <div class="contact-avatar" id="chat-header-avatar" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--violet));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">JD</div>
+                <div class="chat-header-info">
+                  <div class="chat-header-name" id="chat-header-name">John Doe</div>
+                  <div class="chat-header-status" id="chat-header-status">● Online</div>
+                </div>
+                <div class="chat-actions">
+                  <button class="chat-action-btn" onclick="callContact('voice')" title="Voice call"><i class="fa-solid fa-phone"></i></button>
+                  <button class="chat-action-btn" onclick="callContact('video')" title="Video call"><i class="fa-solid fa-video"></i></button>
+                  <button class="chat-action-btn" onclick="shareLocationToContact()" title="Share location"><i class="fa-solid fa-location-dot"></i></button>
+                </div>
+              </div>
+              <div class="chat-messages" id="chat-messages-area"></div>
+              <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" />
+                <button class="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALLS PANEL -->
+      <div class="panel" id="panel-calls">
+        <div class="calls-panel">
+          <div class="panel-title"><i class="fa-solid fa-phone"></i> Calls</div>
+          <div id="calls-list">
+            <div style="text-align:center;color:var(--text3);padding:40px 0;">
+              <i class="fa-solid fa-phone" style="font-size:48px;opacity:0.2;margin-bottom:12px;display:block;"></i>
+              <p>No calls yet. Start a call from the Messages panel.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOCATION PANEL -->
+      <div class="panel" id="panel-location">
+        <div class="location-panel">
+          <div class="panel-title"><i class="fa-solid fa-location-dot"></i> Location & Meetings</div>
+          <div class="map-container" id="map-container">
+            <div class="map-placeholder" id="map-placeholder">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <p>Click "Get My Location" to see your position</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:20px;">
+            <button class="share-btn" style="margin-top:0;" onclick="getLocation()">
+              <i class="fa-solid fa-crosshairs"></i> Get My Location
+            </button>
+          </div>
+          <div class="location-form">
+            <h3>📍 Share Location for a Meeting</h3>
+            <input type="text" class="share-input" id="meeting-title" placeholder="Meeting Title (e.g. Coffee at Central Park)" />
+            <input type="text" class="share-input" id="share-with-email" placeholder="Share with (email or contact name)" />
+            <input type="text" class="share-input" id="location-name" placeholder="Location name (auto-filled or type manually)" id="loc-name-input" />
+            <button class="share-btn" onclick="shareLocation()">
+              <i class="fa-solid fa-share-from-square"></i> Share Location
+            </button>
+          </div>
+          <div id="shared-locations-list" style="margin-top:24px;"></div>
+        </div>
+      </div>
+
+      <!-- PEOPLE PANEL -->
+      <div class="panel" id="panel-people">
+        <div class="dashboard">
+          <div class="panel-title"><i class="fa-solid fa-user-group"></i> Find People</div>
+          <div style="margin-bottom:20px;display:flex;gap:10px;">
+            <input type="text" class="big-search" id="people-search-input" placeholder="Search by name or email..." oninput="searchPeople(this.value)" style="flex:1;" />
+          </div>
+          <div id="people-results"></div>
+          <div id="people-contacts-section">
+            <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text2);">YOUR CONNECTIONS</h3>
+            <div id="contacts-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEARCH PANEL -->
+      <div class="panel" id="panel-search">
+        <div class="search-panel">
+          <div class="panel-title"><i class="fa-brands fa-google"></i> Search the Web</div>
+          <div class="search-header">
+            <div class="big-search-wrap">
+              <input type="text" class="big-search" id="web-search-input" placeholder="Search for anything..." onkeydown="if(event.key==='Enter')doSearch()" />
+            </div>
+            <div class="search-engine-btns">
+              <button class="engine-btn google" onclick="searchGoogle()">
+                <i class="fa-brands fa-google"></i> Search Google
+              </button>
+              <button class="engine-btn youtube" onclick="searchYouTube()">
+                <i class="fa-brands fa-youtube"></i> Search YouTube
+              </button>
+            </div>
+          </div>
+          <div class="yt-embed-area hidden" id="yt-embed-area">
+            <iframe id="yt-iframe" src="" allowfullscreen></iframe>
+          </div>
+          <div id="search-quick-links" style="margin-top:24px;">
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">POPULAR LINKS</p>
+            <div class="quick-grid">
+              <div class="quick-card" onclick="window.open('https://www.google.com','_blank')">
+                <div class="quick-card-icon" style="background:rgba(66,133,244,0.1);color:#4285F4;"><i class="fa-brands fa-google"></i></div>
+                <h3>Google</h3><p>Open Google Search</p>
+              </div>
+              <div class="quick-card" onclick="window.open('https://www.youtube.com','_blank')">
+                <div class="quick-card-icon" style="background:rgba(255,0,0,0.08);color:#FF0000;"><i class="fa-brands fa-youtube"></i></div>
+                <h3>YouTube</h3><p>Open YouTube</p>
+              </div>
+              <div class="quick-card" onclick="window.open('https://maps.google.com','_blank')">
+                <div class="quick-card-icon" style="background:rgba(52,168,83,0.1);color:#34A853;"><i class="fa-solid fa-map"></i></div>
+                <h3>Google Maps</h3><p>Explore the world</p>
+              </div>
+              <div class="quick-card" onclick="window.open('https://news.google.com','_blank')">
+                <div class="quick-card-icon" style="background:rgba(234,67,53,0.08);color:#EA4335;"><i class="fa-solid fa-newspaper"></i></div>
+                <h3>Google News</h3><p>Today's top stories</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /app-main -->
+</div><!-- /app-page -->
+
+<script>
+// =====================================================
+// STATE
+// =====================================================
+const API = '/api';
+let currentUser = null;
+let authToken = null;
+let currentChatContact = null;
+let contacts = [];
+let callTimer = null;
+let callSeconds = 0;
+let isMuted = false;
+let isVideoOff = false;
+let userLocation = null;
+let messagePolling = null;
+
+// =====================================================
+// INIT
+// =====================================================
+window.onload = () => {
+  authToken = localStorage.getItem('nexlink_token');
+  if (authToken) {
+    verifySession();
+  }
+  document.getElementById('header-search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') openPanel('people');
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#profile-dropdown') && !e.target.closest('#user-avatar-btn')) {
+      document.getElementById('profile-dropdown').classList.remove('show');
+    }
+  });
+};
+
+async function verifySession() {
+  try {
+    const res = await apiFetch('/auth/me');
+    if (res.ok) {
+      const data = await res.json();
+      currentUser = data.user;
+      enterApp();
+    } else {
+      localStorage.removeItem('nexlink_token');
+      authToken = null;
+    }
+  } catch {}
+}
+
+// =====================================================
+// AUTH HELPERS
+// =====================================================
+function showAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+}
+
+function togglePassword(id, btn) {
+  const input = document.getElementById(id);
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'fa-regular fa-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'fa-regular fa-eye';
+  }
+}
+
+// =====================================================
+// LOGIN
+// =====================================================
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const pin = document.getElementById('login-pin').value || undefined;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Signing in...';
+
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, pin })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      if (data.requiresPin) {
+        document.getElementById('login-pin-group').style.display = 'block';
+        showError('login-error', 'Please enter your 4-digit PIN.');
+      } else {
+        showError('login-error', data.error || 'Login failed');
+      }
+      return;
+    }
+
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('nexlink_token', authToken);
+
+    if (!data.user.permissionsGranted) {
+      document.getElementById('permissions-modal').classList.add('show');
+    } else {
+      enterApp();
+    }
+  } catch (err) {
+    showError('login-error', 'Connection error. Is the server running?');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Sign In to NexLink';
+  }
+}
+
+// =====================================================
+// SIGNUP
+// =====================================================
+async function handleSignup(e) {
+  e.preventDefault();
+  const btn = document.getElementById('signup-btn');
+  const errEl = document.getElementById('signup-error');
+  errEl.style.display = 'none';
+
+  const firstName = document.getElementById('signup-first').value;
+  const lastName = document.getElementById('signup-last').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const confirmPassword = document.getElementById('signup-confirm').value;
+  const pin = document.getElementById('signup-pin').value || undefined;
+
+  if (password !== confirmPassword) {
+    return showError('signup-error', 'Passwords do not match.');
+  }
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+    return showError('signup-error', 'Password needs uppercase, lowercase, and a number.');
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Creating account...';
+
+  try {
+    const res = await fetch(`${API}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, lastName, email, password, confirmPassword, pin })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      const msg = data.errors ? data.errors[0].msg : (data.error || 'Signup failed');
+      showError('signup-error', msg);
+      return;
+    }
+
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('nexlink_token', authToken);
+    document.getElementById('permissions-modal').classList.add('show');
+  } catch {
+    showError('signup-error', 'Connection error. Is the server running?');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Create My Account';
+  }
+}
+
+// =====================================================
+// PERMISSIONS
+// =====================================================
+async function handlePermissions(allowed) {
+  document.getElementById('permissions-modal').classList.remove('show');
+
+  if (allowed) {
+    // Request actual browser permissions
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      showToast('Camera & microphone access granted!', 'success');
+    } catch { showToast('Camera access denied by browser.', 'info'); }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        showToast('Location access granted!', 'success');
+      });
+    }
+  }
+
+  // Save to backend
+  await apiFetch('/auth/permissions', 'POST', {
+    camera: allowed, location: allowed, calls: allowed, granted: allowed
+  });
+
+  if (allowed) {
+    showToast('All permissions granted. Welcome to NexLink!', 'success');
+  } else {
+    showToast('Permissions declined. Some features may be limited.', 'info');
+  }
+
+  enterApp();
+}
+
+// =====================================================
+// ENTER APP
+// =====================================================
+function enterApp() {
+  showPage('app-page');
+  const initials = `${currentUser.firstName[0]}${currentUser.lastName[0]}`.toUpperCase();
+  document.getElementById('header-avatar-initials').textContent = initials;
+  document.getElementById('welcome-text').textContent = `Welcome back, ${currentUser.firstName}! 👋`;
+  document.getElementById('dd-name').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+  document.getElementById('dd-email').textContent = currentUser.email;
+  loadContacts();
+  loadCallHistory();
+  openPanel('dashboard');
+}
+
+// =====================================================
+// PAGE / PANEL NAVIGATION
+// =====================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function openPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  const sb = document.getElementById(`sb-${name}`);
+  if (sb) sb.classList.add('active');
+  document.getElementById('profile-dropdown').classList.remove('show');
+}
+
+function toggleDropdown() {
+  document.getElementById('profile-dropdown').classList.toggle('show');
+}
+
+// =====================================================
+// API HELPER
+// =====================================================
+async function apiFetch(path, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}) }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  return fetch(`${API}${path}`, opts);
+}
+
+// =====================================================
+// CONTACTS / PEOPLE
+// =====================================================
+async function loadContacts() {
+  try {
+    const res = await apiFetch('/users/contacts');
+    if (!res.ok) return;
+    const data = await res.json();
+    contacts = data.contacts;
+    renderContactsList();
+    renderContactsGrid();
+    document.getElementById('stat-contacts').textContent = contacts.length;
+  } catch {}
+}
+
+function renderContactsList() {
+  const el = document.getElementById('contacts-scroll');
+  if (contacts.length === 0) {
+    el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text3);"><i class="fa-solid fa-user-plus" style="font-size:32px;margin-bottom:10px;display:block;opacity:0.3;"></i><p style="font-size:13px;">Add connections to start chatting.</p></div>`;
+    return;
+  }
+  el.innerHTML = contacts.map(c => `
+    <div class="contact-item" onclick="openChat('${c.id}','${c.firstName}','${c.lastName}','${c.isOnline}')">
+      <div class="contact-avatar">
+        ${c.firstName[0]}${c.lastName[0]}
+        ${c.isOnline ? '<span class="online-dot"></span>' : ''}
+      </div>
+      <div class="contact-info">
+        <div class="contact-name">${c.firstName} ${c.lastName}</div>
+        <div class="contact-last">${c.isOnline ? '● Online' : 'Offline'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderContactsGrid() {
+  const el = document.getElementById('contacts-grid');
+  if (contacts.length === 0) {
+    el.innerHTML = `<p style="color:var(--text3);font-size:14px;">No connections yet. Search for people above.</p>`;
+    return;
+  }
+  el.innerHTML = contacts.map(c => `
+    <div class="call-item">
+      <div class="contact-avatar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--violet));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;">
+        ${c.firstName[0]}${c.lastName[0]}
+      </div>
+      <div class="call-info">
+        <div class="call-name">${c.firstName} ${c.lastName}</div>
+        <div class="call-detail">${c.isOnline ? '● Online' : 'Offline'}</div>
+      </div>
+      <div class="call-action-btns">
+        <button class="call-btn voice" onclick="openChat('${c.id}','${c.firstName}','${c.lastName}','${c.isOnline}');openPanel('chat')"><i class="fa-solid fa-message"></i></button>
+        <button class="call-btn video" onclick="startCallWith('${c.id}','${c.firstName} ${c.lastName}','voice')"><i class="fa-solid fa-phone"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterContacts(q) {
+  const items = document.querySelectorAll('#contacts-scroll .contact-item');
+  items.forEach(item => {
+    const name = item.querySelector('.contact-name').textContent.toLowerCase();
+    item.style.display = name.includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+let peopleSearchTimeout;
+function searchPeople(q) {
+  clearTimeout(peopleSearchTimeout);
+  if (q.length < 2) { document.getElementById('people-results').innerHTML = ''; return; }
+  peopleSearchTimeout = setTimeout(async () => {
+    const res = await apiFetch(`/users/search?q=${encodeURIComponent(q)}`);
+    if (!res.ok) return;
+    const { users } = await res.json();
+    const el = document.getElementById('people-results');
+    if (users.length === 0) {
+      el.innerHTML = `<p style="color:var(--text3);font-size:14px;margin-bottom:20px;">No users found for "${q}"</p>`;
+      return;
+    }
+    el.innerHTML = `<div style="margin-bottom:24px;">${users.map(u => `
+      <div class="call-item">
+        <div class="contact-avatar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--violet));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;">${u.firstName[0]}${u.lastName[0]}</div>
+        <div class="call-info">
+          <div class="call-name">${u.firstName} ${u.lastName}</div>
+          <div class="call-detail">${u.email}</div>
+        </div>
+        <button class="btn-primary" style="width:auto;padding:8px 16px;margin-top:0;" onclick="connectUser('${u.id}','${u.firstName}','${u.lastName}',this)">
+          <i class="fa-solid fa-user-plus"></i> Connect
+        </button>
+      </div>
+    `).join('')}</div>`;
+  }, 300);
+}
+
+async function connectUser(userId, firstName, lastName, btn) {
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  const res = await apiFetch('/users/connect', 'POST', { userId });
+  if (res.ok) {
+    btn.innerHTML = '✓ Connected';
+    btn.style.background = 'linear-gradient(135deg,var(--cyan),var(--blue))';
+    showToast(`Connected with ${firstName} ${lastName}!`, 'success');
+    loadContacts();
+  }
+}
+
+// =====================================================
+// CHAT
+// =====================================================
+function openChat(id, firstName, lastName, isOnline) {
+  currentChatContact = { id, firstName, lastName, isOnline: isOnline === 'true' || isOnline === true };
+  const initials = `${firstName[0]}${lastName[0]}`;
+
+  document.getElementById('chat-header-avatar').textContent = initials;
+  document.getElementById('chat-header-name').textContent = `${firstName} ${lastName}`;
+  document.getElementById('chat-header-status').textContent = currentChatContact.isOnline ? '● Online' : '○ Offline';
+  document.getElementById('chat-header-status').style.color = currentChatContact.isOnline ? 'var(--cyan)' : 'var(--text3)';
+
+  document.getElementById('chat-empty').style.display = 'none';
+  const activeWin = document.getElementById('chat-active');
+  activeWin.style.display = 'flex';
+  activeWin.style.flexDirection = 'column';
+  activeWin.style.flex = '1';
+
+  document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('chat-layout').classList.add('chat-open');
+
+  loadMessages(id);
+  if (messagePolling) clearInterval(messagePolling);
+  messagePolling = setInterval(() => loadMessages(id), 5000);
+}
+
+async function loadMessages(contactId) {
+  const res = await apiFetch(`/users/messages/${contactId}`);
+  if (!res.ok) return;
+  const { messages } = await res.json();
+  const area = document.getElementById('chat-messages-area');
+  const myId = currentUser.id;
+  area.innerHTML = messages.map(m => {
+    const isMe = m.sender_id === myId;
+    const initials = isMe
+      ? `${currentUser.firstName[0]}${currentUser.lastName[0]}`
+      : `${currentChatContact.firstName[0]}${currentChatContact.lastName[0]}`;
+    const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="msg-wrap ${isMe ? 'me' : ''}">
+        <div class="msg-avatar">${initials}</div>
+        <div>
+          <div class="msg-bubble">${escapeHTML(m.content)}</div>
+          <div class="msg-time">${time}</div>
+        </div>
+      </div>`;
+  }).join('');
+  area.scrollTop = area.scrollHeight;
+  document.getElementById('stat-messages').textContent = messages.length;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const content = input.value.trim();
+  if (!content || !currentChatContact) return;
+  input.value = '';
+
+  const res = await apiFetch('/users/messages', 'POST', { receiverId: currentChatContact.id, content });
+  if (res.ok) {
+    loadMessages(currentChatContact.id);
+  }
+}
+
+// =====================================================
+// CALLS
+// =====================================================
+async function loadCallHistory() {
+  const res = await apiFetch('/users/calls/history');
+  if (!res.ok) return;
+  const { calls } = await res.json();
+  document.getElementById('stat-calls').textContent = calls.length;
+  const list = document.getElementById('calls-list');
+  if (calls.length === 0) return;
+  list.innerHTML = calls.map(c => {
+    const isOutgoing = c.caller_id === currentUser.id;
+    const otherName = isOutgoing ? `${c.receiver_first} ${c.receiver_last}` : `${c.caller_first} ${c.caller_last}`;
+    const type = c.status === 'missed' ? 'missed' : (isOutgoing ? 'outgoing' : 'incoming');
+    const icon = type === 'missed' ? 'fa-phone-slash' : (isOutgoing ? 'fa-phone-arrow-up-right' : 'fa-phone-arrow-down-left');
+    const time = new Date(c.started_at).toLocaleString([], { dateStyle:'short', timeStyle:'short' });
+    const dur = c.duration_seconds > 0 ? `${Math.floor(c.duration_seconds/60)}m ${c.duration_seconds%60}s` : c.status;
+    return `
+      <div class="call-item">
+        <div class="call-icon ${type}"><i class="fa-solid ${icon}"></i></div>
+        <div class="call-info">
+          <div class="call-name">${otherName}</div>
+          <div class="call-detail">${c.call_type === 'video' ? '📹' : '📞'} ${dur}</div>
+        </div>
+        <div class="call-time">${time}</div>
+        <div class="call-action-btns">
+          <button class="call-btn voice" onclick="startCallWith(null,'${otherName}','voice')"><i class="fa-solid fa-phone"></i></button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function callContact(type) {
+  if (!currentChatContact) return;
+  startCallWith(currentChatContact.id, `${currentChatContact.firstName} ${currentChatContact.lastName}`, type);
+}
+
+function startNewCall() {
+  if (contacts.length === 0) {
+    showToast('Add connections first to make calls.', 'info');
+    openPanel('people');
+    return;
+  }
+  openPanel('chat');
+}
+
+function startCallWith(userId, name, type='voice') {
+  const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('call-avatar-text').textContent = initials;
+  document.getElementById('call-contact-name').textContent = name;
+  document.getElementById('call-status-text').textContent = type === 'video' ? '📹 Video Calling...' : '📞 Calling...';
+  document.getElementById('call-timer').classList.add('hidden');
+  document.getElementById('call-modal').classList.add('show');
+
+  // Simulate call connecting
+  setTimeout(() => {
+    document.getElementById('call-status-text').textContent = type === 'video' ? '📹 Video Connected' : '📞 Connected';
+    document.getElementById('call-timer').classList.remove('hidden');
+    callSeconds = 0;
+    callTimer = setInterval(() => {
+      callSeconds++;
+      const m = Math.floor(callSeconds/60);
+      const s = String(callSeconds%60).padStart(2,'0');
+      document.getElementById('call-timer').textContent = `${m}:${s}`;
+    }, 1000);
+    if (userId) {
+      apiFetch('/users/calls/log', 'POST', { receiverId: userId, callType: type, status: 'answered' });
+    }
+  }, 2000);
+}
+
+function endCall() {
+  clearInterval(callTimer);
+  document.getElementById('call-modal').classList.remove('show');
+  showToast(`Call ended (${Math.floor(callSeconds/60)}:${String(callSeconds%60).padStart(2,'0')})`, 'info');
+  loadCallHistory();
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  const btn = document.getElementById('mute-btn');
+  btn.innerHTML = isMuted ? '<i class="fa-solid fa-microphone-slash"></i>' : '<i class="fa-solid fa-microphone"></i>';
+  btn.style.background = isMuted ? 'rgba(255,87,87,0.2)' : '';
+  btn.style.color = isMuted ? 'var(--danger)' : '';
+}
+
+function toggleVideo() {
+  isVideoOff = !isVideoOff;
+  const btn = document.getElementById('vid-btn');
+  btn.innerHTML = isVideoOff ? '<i class="fa-solid fa-video-slash"></i>' : '<i class="fa-solid fa-video"></i>';
+  btn.style.background = isVideoOff ? 'rgba(255,87,87,0.2)' : '';
+  btn.style.color = isVideoOff ? 'var(--danger)' : '';
+}
+
+// =====================================================
+// LOCATION
+// =====================================================
+function getLocation() {
+  if (!navigator.geolocation) {
+    showToast('Geolocation not supported by your browser.', 'error');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos => {
+    userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    const mapEl = document.getElementById('map-container');
+    mapEl.innerHTML = `
+      <iframe 
+        src="https://maps.google.com/maps?q=${userLocation.lat},${userLocation.lng}&z=15&output=embed"
+        style="width:100%;height:100%;border:none;" allowfullscreen></iframe>
+    `;
+    document.getElementById('loc-name-input') && (document.getElementById('loc-name-input').value = `${userLocation.lat.toFixed(5)}, ${userLocation.lng.toFixed(5)}`);
+    showToast('Location found!', 'success');
+  }, err => {
+    showToast('Could not get location: ' + err.message, 'error');
+    // Show dot animation as fallback
+    document.getElementById('map-placeholder').innerHTML = `
+      <div class="map-dot" style="position:relative;margin:auto;"></div>
+      <p style="margin-top:16px;">Location access blocked. Enable it in browser settings.</p>
+    `;
+  });
+}
+
+async function shareLocation() {
+  const meetingTitle = document.getElementById('meeting-title').value;
+  const shareWith = document.getElementById('share-with-email').value;
+  const locName = document.getElementById('location-name').value;
+
+  if (!userLocation) {
+    showToast('Get your location first!', 'error');
+    return;
+  }
+  if (!meetingTitle || !shareWith) {
+    showToast('Please fill meeting title and recipient.', 'error');
+    return;
+  }
+
+  // Find contact by email or name
+  const contact = contacts.find(c => c.email === shareWith || `${c.firstName} ${c.lastName}`.toLowerCase() === shareWith.toLowerCase());
+  if (!contact) {
+    showToast('Contact not found. Add them as a connection first.', 'error');
+    return;
+  }
+
+  const res = await apiFetch('/users/location/share', 'POST', {
+    sharedWith: contact.id,
+    latitude: userLocation.lat,
+    longitude: userLocation.lng,
+    locationName: locName || `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`,
+    meetingTitle
+  });
+
+  if (res.ok) {
+    showToast(`📍 Location shared with ${contact.firstName} for "${meetingTitle}"!`, 'success');
+    document.getElementById('meeting-title').value = '';
+    document.getElementById('share-with-email').value = '';
+    document.getElementById('stat-locations').textContent = parseInt(document.getElementById('stat-locations').textContent) + 1;
+    loadSharedLocations();
+  }
+}
+
+function shareLocationToContact() {
+  if (!currentChatContact) return;
+  document.getElementById('share-with-email').value = `${currentChatContact.firstName} ${currentChatContact.lastName}`;
+  openPanel('location');
+  showToast(`Sharing location with ${currentChatContact.firstName}. Get your location first.`, 'info');
+}
+
+async function loadSharedLocations() {
+  const res = await apiFetch('/users/location/shared-with-me');
+  if (!res.ok) return;
+  const { locations } = await res.json();
+  const el = document.getElementById('shared-locations-list');
+  if (locations.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px;">📍 Shared With You</h3>
+    ${locations.map(l => `
+      <div class="call-item">
+        <div class="call-icon incoming"><i class="fa-solid fa-location-dot"></i></div>
+        <div class="call-info">
+          <div class="call-name">${l.meeting_title || 'Location Share'}</div>
+          <div class="call-detail">From: ${l.first_name} ${l.last_name} · ${l.location_name || `${l.latitude}, ${l.longitude}`}</div>
+        </div>
+        <button class="call-btn voice" onclick="window.open('https://maps.google.com/?q=${l.latitude},${l.longitude}','_blank')">
+          <i class="fa-solid fa-map"></i>
+        </button>
+      </div>
+    `).join('')}
+  `;
+}
+
+// =====================================================
+// WEB SEARCH
+// =====================================================
+function doSearch() {
+  const q = document.getElementById('web-search-input').value.trim();
+  if (!q) return;
+  searchGoogle();
+}
+
+function searchGoogle() {
+  const q = document.getElementById('web-search-input').value.trim();
+  if (!q) { showToast('Enter a search query first.', 'info'); return; }
+  window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+}
+
+function searchYouTube() {
+  const q = document.getElementById('web-search-input').value.trim();
+  if (!q) { showToast('Enter something to search on YouTube.', 'info'); return; }
+  const ytArea = document.getElementById('yt-embed-area');
+  ytArea.classList.remove('hidden');
+  document.getElementById('yt-iframe').src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(q)}`;
+  showToast(`Showing YouTube results for: ${q}`, 'success');
+}
+
+// =====================================================
+// LOGOUT
+// =====================================================
+async function logout() {
+  await apiFetch('/auth/logout', 'POST');
+  localStorage.removeItem('nexlink_token');
+  authToken = null;
+  currentUser = null;
+  if (messagePolling) clearInterval(messagePolling);
+  showPage('auth-page');
+  showAuthTab('login');
+  showToast('Signed out successfully.', 'info');
+}
+
+// =====================================================
+// TOAST
+// =====================================================
+function showToast(msg, type='info') {
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<i class="fa-solid ${icons[type]} toast-icon"></i><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

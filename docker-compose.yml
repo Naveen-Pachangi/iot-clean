@@ -1,0 +1,87 @@
+version: '3.9'
+
+services:
+  # ─────────────────────────────────────────
+  # PostgreSQL Database (mirrors AWS RDS setup)
+  # ─────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: nexlink_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nexlink}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-nexlink_pass_change_me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+    networks:
+      - nexlink_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-nexlink}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────
+  # NexLink Application Server
+  # ─────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexlink_app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-nexlink}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-nexlink_pass_change_me}
+      DB_SSL: "false"
+      JWT_SECRET: ${JWT_SECRET:-change_this_to_a_random_secret_in_production}
+      JWT_EXPIRES: ${JWT_EXPIRES:-7d}
+      RUN_MIGRATION: "false"  # schema loaded via docker-entrypoint-initdb.d
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:80}
+    ports:
+      - "3001:3001"
+    networks:
+      - nexlink_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/health || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────
+  # Nginx Reverse Proxy
+  # ─────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: nexlink_nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    networks:
+      - nexlink_net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  nexlink_net:
+    driver: bridge
